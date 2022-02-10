@@ -1,0 +1,15 @@
+name: Man10RespawnAnchor
+version: '${project.version}'
+main: yusama125718_209282ihcuobust.man10respawnanchor.Man10RespawnAnchor
+api-version: 1.17
+
+commands:
+  mspawn:
+    description: man10respawnanchor
+    usage: /<command> [text] [text] [text]
+
+permissions:
+  mspawn.op:
+    default: op
+  mspawn.player:
+    default: op

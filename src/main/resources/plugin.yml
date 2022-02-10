@@ -6,7 +6,7 @@ api-version: 1.17
 commands:
   mspawn:
     description: man10respawnanchor
-    usage: /<command> [text] [text] [text]
+    usage: /<command> [text] [text]
 
 permissions:
   mspawn.op:

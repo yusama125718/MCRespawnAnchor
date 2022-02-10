@@ -1,36 +1,37 @@
 package yusama125718_209282ihcuobust.man10respawnanchor;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameEvent;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
+import java.util.Random;
 
 import static org.bukkit.Bukkit.getPlayer;
+import static org.bukkit.Bukkit.getServerIcon;
 
-public final class Man10RespawnAnchor extends JavaPlugin
+public final class Man10RespawnAnchor extends JavaPlugin implements Listener
 {
     double respawnyawd;
     float respawnyaw;
-    private Man10RespawnAnchor mspawn;
+    public JavaPlugin mspawn;
     double respawnx;
     double respawny;
     double respawnz;
-    double respawnhelth;
+    double respawnhealth;
     double respawnpitchd;
     float respawnpitch;
     int respawnfood;
     World respawnworld;
     Player respawnplayer;
+    String respawnmessage;
 
     @Override
     public void onEnable()
@@ -52,8 +53,10 @@ public final class Man10RespawnAnchor extends JavaPlugin
         respawnpitchd = mspawn.getConfig().getDouble("spawnpitch");
         respawnyaw = (float) respawnyawd;
         respawnpitch = (float) respawnpitchd;
-        respawnhelth = mspawn.getConfig().getDouble("respawnhelth");
+        respawnhealth = mspawn.getConfig().getDouble("respawnhealth");
         respawnfood = mspawn.getConfig().getInt("respawnfood");
+        respawnmessage = mspawn.getConfig().getString("respawnmessage");
+        getServer().getPluginManager().registerEvents(this, this);
     }
 
     @Override
@@ -74,8 +77,9 @@ public final class Man10RespawnAnchor extends JavaPlugin
                     {
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set : spawn地点を現在地にセットします");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn reload : configをリロードします");
-                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set helth : リスポーン時の体力を設定します");
-                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set food : リスポーン時の満腹度を設定します");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn sethealth : リスポーン時の体力を設定します");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn setfood : リスポーン時の満腹度を設定します");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn message : リスポーン時のメッセージを設定します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn respawn [ユーザー名] : 特定のユーザーをリスポーンします");
                     }
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn respawn : リスポーンします");
@@ -145,8 +149,9 @@ public final class Man10RespawnAnchor extends JavaPlugin
                     respawnfood = mspawn.getConfig().getInt("respawnfood");
                     respawnyaw = (float) respawnyawd;
                     respawnpitch = (float) respawnpitchd;
-                    respawnhelth = mspawn.getConfig().getDouble("respawnhelth");
+                    respawnhealth = mspawn.getConfig().getDouble("respawnhealth");
                     respawnfood = mspawn.getConfig().getInt("respawnfood");
+                    respawnmessage = mspawn.getConfig().getString("respawnmessage");
                     sender.sendMessage("§l[§fMan10Spawn§f§l]§eリロードしました");
                     return true;
                 }
@@ -176,60 +181,76 @@ public final class Man10RespawnAnchor extends JavaPlugin
                     pLocation.setPitch(respawnpitch);
                     pLocation.setWorld(respawnworld);
                     respawnplayer.teleport(pLocation);
-                    respawnplayer.setFoodLevel(respawnfood);
                     sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+respawnplayer.getName()+"をリスポーンしました");
                     respawnplayer.sendMessage("§l[§fMan10Spawn§f§l]§eリスポーンしました");
                     return true;
                 }
-                break;
-            }
-            case 3:
-            {
-                if (args[0].equals("set")&&args[1].equals("helth"))
+                if (args[0].equals("sethealth"))
                 {
                     if (!sender.hasPermission("mspawn.op"))
                     {
                         sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
                         return true;
                     }
-                    boolean isNumeric = args[2].matches("-?\\d+");
+                    boolean isNumeric = args[1].matches("-?\\d+");
                     if (!isNumeric)
                     {
                         sender.sendMessage("§l[§fMan10Spawn§f§l]§c体力は整数にしてください");
                         return true;
                     }
-                    int sethelth = Integer.parseInt(args[2]);
-                    if (sethelth>20||sethelth<1)
+                    int sethealth = Integer.parseInt(args[1]);
+                    if (sethealth>20||sethealth<1)
                     {
                         sender.sendMessage("§l[§fMan10Spawn§f§l]§c体力は1以上20以下の数字にしてください");
                         return true;
                     }
-                    mspawn.getConfig().set("respawnhelth",sethelth);
+                    mspawn.getConfig().set("respawnhealth",sethealth);
                     mspawn.saveConfig();
+                    respawnhealth = sethealth;
                     sender.sendMessage("§l[§fMan10Spawn§f§l]§eセットしました");
                     return true;
                 }
-                if (!args[0].equals("set")&&args[1].equals("food"))
+                if (args[0].equals("setfood"))
                 {
-                    if (sender.hasPermission("mspawn.op"))
+                    if (!sender.hasPermission("mspawn.op"))
                     {
                         sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
                         return true;
                     }
-                    boolean isNumeric = args[2].matches("-?\\d+");
+                    boolean isNumeric = args[1].matches("-?\\d+");
                     if (!isNumeric)
                     {
-                        sender.sendMessage("§l[§fMan10Spawn§f§l]§c体力は整数にしてください");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l]§c満腹度は整数にしてください");
                         return true;
                     }
-                    int setfood = Integer.parseInt(args[2]);
+                    int setfood = Integer.parseInt(args[1]);
                     if (setfood>20||setfood<0)
                     {
-                        sender.sendMessage("§l[§fMan10Spawn§f§l]§c体力は0以上20以下の数字にしてください");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l]§c満腹度は0以上20以下の数字にしてください");
                         return true;
                     }
                     mspawn.getConfig().set("respawnfood",setfood);
                     mspawn.saveConfig();
+                    respawnfood = setfood;
+                    sender.sendMessage("§l[§fMan10Spawn§f§l]§eセットしました");
+                    return true;
+                }
+                if (args[0].equals("setmessage"))
+                {
+                    if (!sender.hasPermission("mspawn.op"))
+                    {
+                        sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
+                        return true;
+                    }
+                    if (args[1].length()>100)
+                    {
+                        sender.sendMessage("§l[§fMan10Spawn§f§l]§c文字数は100文字までにしてください");
+                        return true;
+                    }
+                    String setmessage = args[1];
+                    mspawn.getConfig().set("respawnmessage",setmessage);
+                    mspawn.saveConfig();
+                    respawnmessage = setmessage;
                     sender.sendMessage("§l[§fMan10Spawn§f§l]§eセットしました");
                     return true;
                 }
@@ -241,8 +262,9 @@ public final class Man10RespawnAnchor extends JavaPlugin
                 {
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set : spawn地点を現在地にセットします");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn reload : configをリロードします");
-                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set helth : リスポーン時の体力を設定します");
-                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set food : リスポーン時の満腹度を設定します");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn sethealth : リスポーン時の体力を設定します");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn setfood : リスポーン時の満腹度を設定します");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn message : リスポーン時のメッセージを設定します");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn respawn [ユーザー名] : 特定のユーザーをリスポーンします");
                 }
                 sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn respawn : リスポーンします");
@@ -253,19 +275,26 @@ public final class Man10RespawnAnchor extends JavaPlugin
     }
 
     @EventHandler
-    public void onPlayerRespawn(PlayerRespawnEvent player)
+    public void PlayerRespawnEvent(PlayerRespawnEvent event)
     {
-        Bukkit.getLogger().info("メッセージ");
-        respawnplayer = player.getPlayer();
-        Location respawnlocation = player.getRespawnLocation();
+        Location respawnlocation = event.getRespawnLocation();
         respawnlocation.setX(respawnx);
         respawnlocation.setY(respawny);
         respawnlocation.setZ(respawnz);
         respawnlocation.setYaw(respawnyaw);
         respawnlocation.setPitch(respawnpitch);
         respawnlocation.setWorld(respawnworld);
-        respawnplayer.setHealth(respawnhelth);
-        respawnplayer.setFoodLevel(respawnfood);
+        event.setRespawnLocation(respawnlocation);
+        Bukkit.getScheduler().runTaskLater(this, new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                event.getPlayer().setHealth(respawnhealth);
+                event.getPlayer().setFoodLevel(respawnfood);
+                event.getPlayer().sendMessage(respawnmessage);
+            }
+        }, 1);
     }
 
     @Override

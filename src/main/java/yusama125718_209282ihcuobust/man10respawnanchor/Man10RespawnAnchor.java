@@ -1,6 +1,5 @@
 package yusama125718_209282ihcuobust.man10respawnanchor;
 
-import org.apache.commons.lang.UnhandledException;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -10,9 +9,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Random;
-
-import static org.bukkit.Bukkit.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public final class Man10RespawnAnchor extends JavaPlugin implements Listener
 {
@@ -29,6 +28,9 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
     World respawnworld;
     Player respawnplayer;
     String respawnmessage;
+    boolean System;
+    static List<UUID> exceptionplayers=new ArrayList<>();
+    static List<World> exceptionworlds=new ArrayList<>();
 
     @Override
     public void onEnable()
@@ -53,6 +55,9 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
         respawnhealth = mspawn.getConfig().getDouble("respawnhealth");
         respawnfood = mspawn.getConfig().getInt("respawnfood");
         respawnmessage = mspawn.getConfig().getString("respawnmessage");
+        System = mspawn.getConfig().getBoolean("system");
+        exceptionplayers = (List<UUID>) mspawn.getConfig().getList("exceptionplayerlist");
+        exceptionworlds = (List<World>) mspawn.getConfig().getList("exceptionworldlist");
         getServer().getPluginManager().registerEvents(this, this);
     }
 
@@ -68,12 +73,40 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
         {
             case 1:
             {
+                if (args[0].equals("on"))
+                {
+                    if (!sender.hasPermission("mspawn.op"))
+                    {
+                        sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
+                        return true;
+                    }
+                    System = true;
+                    mspawn.getConfig().set("system",true);
+                    saveConfig();
+                }
+                if (args[0].equals("off"))
+                {
+                    if (!sender.hasPermission("mspawn.op"))
+                    {
+                        sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
+                        return true;
+                    }
+                    System = false;
+                    mspawn.getConfig().set("system",false);
+                    saveConfig();
+                }
                 if (args[0].equals("help"))
                 {
                     if (sender.hasPermission("mspawn.op"))
                     {
-                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set : spawn地点を現在地にセットします");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set : mspanwのデフォルトのspawn地点を現在地にセットします");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn reload : configをリロードします");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn on : mspawnを有効化します");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn off : mspawnを無効化します");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exception add [ユーザー名] : mspawnを無効化するプレイヤーを追加します");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exception delete [ユーザー名] : mspawnを無効化するプレイヤーから除外します");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exceptionw add [ワールド名] : mspawnを無効化するワールドを追加します");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exceptionw delete [ワールド名] : mspawnを無効化するワールドから除外します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn sethealth : リスポーン時の体力を設定します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn setfood : リスポーン時の満腹度を設定します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn message : リスポーン時のメッセージを設定します");
@@ -113,6 +146,11 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
                 }
                 if (args[0].equals("respawn"))
                 {
+                    if (!System)
+                    {
+                        sender.sendMessage(("§l[§fMan10Spawn§f§l]§c現在OFFです"));
+                        return true;
+                    }
                     if (!(sender instanceof Player))
                     {
                         sender.sendMessage(("§l[§fMan10Spawn§f§l]§cPlayer以外は実行できません"));
@@ -137,6 +175,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
                         sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
                         return true;
                     }
+                    mspawn.reloadConfig();
                     respawnworld = Bukkit.getWorld(getConfig().getString("spawnworld"));
                     respawnyawd = mspawn.getConfig().getDouble("spawnyaw");
                     respawnx = mspawn.getConfig().getDouble("spawnx");
@@ -149,6 +188,9 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
                     respawnhealth = mspawn.getConfig().getDouble("respawnhealth");
                     respawnfood = mspawn.getConfig().getInt("respawnfood");
                     respawnmessage = mspawn.getConfig().getString("respawnmessage");
+                    System = mspawn.getConfig().getBoolean("system");
+                    exceptionplayers = (List<UUID>) mspawn.getConfig().getList("exceptionplayerlist");
+                    exceptionworlds = (List<World>) mspawn.getConfig().getList("exceptionworldlist");
                     sender.sendMessage("§l[§fMan10Spawn§f§l]§eリロードしました");
                     return true;
                 }
@@ -158,6 +200,11 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
             {
                 if (args[0].equals("respawn"))
                 {
+                    if (!System)
+                    {
+                        sender.sendMessage(("§l[§fMan10Spawn§f§l]§c現在OFFです"));
+                        return true;
+                    }
                     if (!sender.hasPermission("mspawn.op"))
                     {
                         sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
@@ -252,6 +299,125 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
                 }
                 break;
             }
+            case 3:
+            {
+                if (args[0].equals("exception"))
+                {
+                    if (args[1].equals("add"))
+                    {
+                        if (!sender.hasPermission("mspawn.op"))
+                        {
+                            sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
+                            return true;
+                        }
+                        Player addplayer = Bukkit.getPlayerExact(args[2]);
+                        if (addplayer == null)
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのプレイヤーは存在しません");
+                            return true;
+                        }
+                        if (exceptionplayers.contains(addplayer.getUniqueId()))
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのプレイヤーはすでに除外されています");
+                            return true;
+                        }
+                        else
+                        {
+                            exceptionplayers.add(addplayer.getUniqueId());
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+addplayer.getName()+"を除外します");
+                            mspawn.getConfig().set("exceptionplayerlist",exceptionplayers);
+                            saveConfig();
+                            return true;
+                        }
+                    }
+                    if (args[1].equals("delete"))
+                    {
+                        if (!sender.hasPermission("mspawn.op"))
+                        {
+                            sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
+                            return true;
+                        }
+                        Player deleteplayer = Bukkit.getPlayerExact(args[2]);
+                        if (deleteplayer == null)
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのプレイヤーは存在しません");
+                            return true;
+                        }
+                        if (exceptionplayers.contains(deleteplayer.getUniqueId()))
+                        {
+                            exceptionplayers.remove(deleteplayer.getUniqueId());
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+deleteplayer.getName()+"を対象にします");
+                            mspawn.getConfig().set("exceptionplayerlist",exceptionplayers);
+                            saveConfig();
+                            return true;
+                        }
+                        else
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのプレイヤーは除外されていません");
+                            return true;
+                        }
+                    }
+                }
+                if (args[0].equals("exceptionw"))
+                {
+                    if (args[1].equals("add"))
+                    {
+                        if (!sender.hasPermission("mspawn.op"))
+                        {
+                            sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
+                            return true;
+                        }
+                        World addworld = Bukkit.getWorld(args[2]);
+                        List<World> worlds = Bukkit.getWorlds();
+                        if (!worlds.contains(addworld))
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのワールドは存在しません");
+                            return true;
+                        }
+                        if (exceptionworlds.contains(addworld))
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのワールドはすでに除外されています");
+                            return true;
+                        }
+                        else
+                        {
+                            exceptionworlds.add(addworld);
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+addworld+"を対象にします");
+                            mspawn.getConfig().set("exceptionworldlist",exceptionworlds);
+                            saveConfig();
+                            return true;
+                        }
+                    }
+                    if (args[1].equals("delete"))
+                    {
+                        if (!sender.hasPermission("mspawn.op"))
+                        {
+                            sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
+                            return true;
+                        }
+                        World deleteworld = Bukkit.getWorld(args[2]);
+                        List<World> worlds = Bukkit.getWorlds();
+                        if (!worlds.contains(deleteworld))
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのワールドは存在しません");
+                            return true;
+                        }
+                        if (exceptionworlds.contains(deleteworld))
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのワールドはすでに除外されています");
+                            return true;
+                        }
+                        else
+                        {
+                            exceptionworlds.remove(deleteworld);
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+deleteworld+"を対象にします");
+                            mspawn.getConfig().set("exceptionworldlist",exceptionworlds);
+                            saveConfig();
+                            return true;
+                        }
+                    }
+                }
+            }
             default:
             {
                 if (sender.hasPermission("mspawn.op"))
@@ -259,6 +425,12 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set : spawn地点を現在地にセットします");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn reload : configをリロードします");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn sethealth : リスポーン時の体力を設定します");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn on : mspawnを有効化します");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn off : mspawnを無効化します");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exception add [ユーザー名] : mspawnを無効化するプレイヤーを追加します");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exception delete [ユーザー名] : mspawnを無効化するプレイヤーから除外します");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exceptionw add [ワールド名] : mspawnを無効化するワールドを追加します");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exceptionw delete [ワールド名] : mspawnを無効化するワールドから除外します");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn setfood : リスポーン時の満腹度を設定します");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn message : リスポーン時のメッセージを設定します");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn respawn [ユーザー名] : 特定のユーザーをリスポーンします");
@@ -273,6 +445,10 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
     @EventHandler
     public void PlayerRespawnEvent(PlayerRespawnEvent event)
     {
+        if (exceptionplayers.contains(event.getPlayer().getUniqueId())||exceptionworlds.contains(event.getPlayer().getWorld()))
+        {
+            return;
+        }
         Location respawnlocation = event.getRespawnLocation();
         respawnlocation.setX(respawnx);
         respawnlocation.setY(respawny);

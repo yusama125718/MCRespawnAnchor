@@ -1,23 +1,24 @@
 package yusama125718_209282ihcuobust.man10respawnanchor;
 
+
 import org.bukkit.*;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-public final class Man10RespawnAnchor extends JavaPlugin implements Listener
+public final class Man10RespawnAnchor extends JavaPlugin implements Listener, CommandExecutor, TabCompleter
 {
     double respawnyawd;
     float respawnyaw;
-    public JavaPlugin mspawn;
+    JavaPlugin mspawn;
     double respawnx;
     double respawny;
     double respawnz;
@@ -29,8 +30,8 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
     Player respawnplayer;
     String respawnmessage;
     boolean System;
-    static List<UUID> exceptionplayers=new ArrayList<>();
-    static List<World> exceptionworlds=new ArrayList<>();
+    List<UUID> exceptionplayers=new ArrayList<>();
+    List<World> exceptionworlds=new ArrayList<>();
 
     @Override
     public void onEnable()
@@ -82,6 +83,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
                     }
                     System = true;
                     mspawn.getConfig().set("system",true);
+                    sender.sendMessage("§l[§fMan10Spawn§f§l]§eONにしました");
                     saveConfig();
                 }
                 if (args[0].equals("off"))
@@ -93,6 +95,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
                     }
                     System = false;
                     mspawn.getConfig().set("system",false);
+                    sender.sendMessage("§l[§fMan10Spawn§f§l]§eOFFにしました");
                     saveConfig();
                 }
                 if (args[0].equals("help"))
@@ -316,10 +319,10 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのプレイヤーは存在しません");
                             return true;
                         }
+                        addplayer = Bukkit.getPlayer(args[2]);
                         if (exceptionplayers.contains(addplayer.getUniqueId()))
                         {
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのプレイヤーはすでに除外されています");
-                            return true;
                         }
                         else
                         {
@@ -327,8 +330,8 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+addplayer.getName()+"を除外します");
                             mspawn.getConfig().set("exceptionplayerlist",exceptionplayers);
                             saveConfig();
-                            return true;
                         }
+                        return true;
                     }
                     if (args[1].equals("delete"))
                     {
@@ -349,13 +352,12 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+deleteplayer.getName()+"を対象にします");
                             mspawn.getConfig().set("exceptionplayerlist",exceptionplayers);
                             saveConfig();
-                            return true;
                         }
                         else
                         {
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのプレイヤーは除外されていません");
-                            return true;
                         }
+                        return true;
                     }
                 }
                 if (args[0].equals("exceptionw"))
@@ -377,7 +379,6 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
                         if (exceptionworlds.contains(addworld))
                         {
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのワールドはすでに除外されています");
-                            return true;
                         }
                         else
                         {
@@ -385,8 +386,8 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+addworld+"を対象にします");
                             mspawn.getConfig().set("exceptionworldlist",exceptionworlds);
                             saveConfig();
-                            return true;
                         }
+                        return true;
                     }
                     if (args[1].equals("delete"))
                     {
@@ -405,7 +406,6 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
                         if (exceptionworlds.contains(deleteworld))
                         {
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのワールドはすでに除外されています");
-                            return true;
                         }
                         else
                         {
@@ -413,8 +413,8 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+deleteworld+"を対象にします");
                             mspawn.getConfig().set("exceptionworldlist",exceptionworlds);
                             saveConfig();
-                            return true;
                         }
+                        return true;
                     }
                 }
             }
@@ -445,7 +445,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
     @EventHandler
     public void PlayerRespawnEvent(PlayerRespawnEvent event)
     {
-        if (exceptionplayers.contains(event.getPlayer().getUniqueId())||exceptionworlds.contains(event.getPlayer().getWorld()))
+        if (exceptionplayers.contains(event.getPlayer().getUniqueId()) || exceptionworlds.contains(event.getPlayer().getWorld()))
         {
             return;
         }
@@ -460,13 +460,140 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener
         Bukkit.getScheduler().runTaskLater(this, new Runnable()
         {
             @Override
-            public void run()
-            {
+            public void run() {
                 event.getPlayer().setHealth(respawnhealth);
                 event.getPlayer().setFoodLevel(respawnfood);
                 event.getPlayer().sendMessage(respawnmessage);
             }
         }, 1);
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args)
+    {
+        if(command.getName().equalsIgnoreCase("mspawn"))
+        {
+            if (args.length == 1)
+            {
+                if (args[0].length() == 0)
+                {
+                    if (sender.hasPermission("mspawn.player")&&!sender.hasPermission("mspawn.op"))
+                    {
+                        return Collections.singletonList("respawn");
+                    }
+                    if (sender.hasPermission("mspawn.op"))
+                    {
+                        return Arrays.asList("exception","exceptionw","message","off","on","reload","respawn","set","setfood","sethealth");
+                    }
+                }
+                else
+                {
+                    if (!(sender.hasPermission("mspawn.player"))&&!(sender.hasPermission("mspawn.op")))
+                    {
+                        return null;
+                    }
+                    if ("respawn".startsWith(args[0])&&"reload".startsWith(args[0]))
+                    {
+                        if (sender.hasPermission("mspawn.op"))
+                        {
+                            return Arrays.asList("reload","respawn");
+                        }
+                        else
+                        {
+                            return Collections.singletonList("respawn");
+                        }
+                    }
+                    if ("respawn".startsWith(args[0]))
+                    {
+                        return Collections.singletonList("respawn");
+                    }
+                    if ("reload".startsWith(args[0]))
+                    {
+                        if (sender.hasPermission("mspawn.op"))
+                        {
+                            return Collections.singletonList("reload");
+                        }
+                    }
+                    else if ("on".startsWith(args[0]) && "off".startsWith(args[0]))
+                    {
+                        return Arrays.asList("on","off");
+                    }
+                    else if("on".startsWith(args[0]))
+                    {
+                        return Collections.singletonList("on");
+                    }
+                    else if("off".startsWith(args[0]))
+                    {
+                        return Collections.singletonList("off");
+                    }
+                    else if ("exception".startsWith(args[0])&&"exceptionw".startsWith(args[0]))
+                    {
+                        return Arrays.asList("exception","exceptionw");
+                    }
+                    else if ("exceptionw".startsWith(args[0]))
+                    {
+                        return Collections.singletonList("exceptionw");
+                    }
+                    else if ("message".startsWith(args[0]))
+                    {
+                        return Collections.singletonList("message");
+                    }
+                    else if ("set".startsWith(args[0])&&"sethealth".startsWith(args[0])&&"setfood".startsWith(args[0]))
+                    {
+                        return Arrays.asList("set","sethealth","setfood");
+                    }
+                    else if ("sethealth".startsWith(args[0]))
+                    {
+                        return Collections.singletonList("sethealth");
+                    }
+                    else if ("setfood".startsWith(args[0]))
+                    {
+                        return Collections.singletonList("setfood");
+                    }
+                }
+            }
+            if (args.length == 2)
+            {
+                if (!sender.hasPermission("mspawn.op"))
+                {
+                    return null;
+                }
+                if (args[1].length() == 0)
+                {
+                    if (args[0].equals("message"))
+                    {
+                        return Collections.singletonList("<text>");
+                    }
+                    else if (args[0].equals("exceptionw"))
+                    {
+                        if ("add".startsWith(args[1]))
+                        {
+                            return Collections.singletonList("add");
+                        }
+                        else if ("delete".startsWith(args[1]))
+                        {
+                            return Collections.singletonList("delete");
+                        }
+                    }
+                }
+            }
+            if (args.length == 3)
+            {
+                if (args[2].length() == 0)
+                {
+                    if (args[0].equals("exceptionw"))
+                    {
+                        ArrayList<String> list = new ArrayList<>();
+                        for (World world : Bukkit.getWorlds())
+                        {
+                            list.add(world.getName());
+                        }
+                        return list;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     @Override

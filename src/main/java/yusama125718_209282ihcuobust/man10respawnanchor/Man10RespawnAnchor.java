@@ -319,7 +319,14 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのプレイヤーは存在しません");
                             return true;
                         }
-                        addplayer = Bukkit.getPlayer(args[2]);
+                        if (exceptionplayers == null)
+                        {
+                            exceptionplayers.add(addplayer.getUniqueId());
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+addplayer.getName()+"を除外します");
+                            mspawn.getConfig().set("exceptionplayerlist",exceptionplayers);
+                            saveConfig();
+                            return true;
+                        }
                         if (exceptionplayers.contains(addplayer.getUniqueId()))
                         {
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのプレイヤーはすでに除外されています");
@@ -344,6 +351,11 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         if (deleteplayer == null)
                         {
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのプレイヤーは存在しません");
+                            return true;
+                        }
+                        if (exceptionplayers == null)
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのプレイヤーは除外されていません");
                             return true;
                         }
                         if (exceptionplayers.contains(deleteplayer.getUniqueId()))
@@ -376,6 +388,14 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのワールドは存在しません");
                             return true;
                         }
+                        if (exceptionworlds == null)
+                        {
+                            exceptionworlds.add(addworld);
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+addworld+"を対象にします");
+                            mspawn.getConfig().set("exceptionworldlist",exceptionworlds);
+                            saveConfig();
+                            return true;
+                        }
                         if (exceptionworlds.contains(addworld))
                         {
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのワールドはすでに除外されています");
@@ -401,6 +421,11 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         if (!worlds.contains(deleteworld))
                         {
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのワールドは存在しません");
+                            return true;
+                        }
+                        if (exceptionworlds == null)
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのワールドは除外されていません");
                             return true;
                         }
                         if (exceptionworlds.contains(deleteworld))
@@ -564,16 +589,24 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     {
                         return Collections.singletonList("<text>");
                     }
-                    else if (args[0].equals("exceptionw"))
+                    else if (args[0].equals("exceptionw")||args[0].equals("exception"))
                     {
-                        if ("add".startsWith(args[1]))
-                        {
-                            return Collections.singletonList("add");
-                        }
-                        else if ("delete".startsWith(args[1]))
-                        {
-                            return Collections.singletonList("delete");
-                        }
+                        return Arrays.asList("add","delete");
+                    }
+                }
+                else if (args[0].equals("exceptionw")||args[0].equals("exception"))
+                {
+                    if ("add".startsWith(args[1])&&"delete".startsWith(args[1]))
+                    {
+                        return Arrays.asList("add","delete");
+                    }
+                    else if ("add".startsWith(args[1]))
+                    {
+                        return Collections.singletonList("add");
+                    }
+                    else if ("delete".startsWith(args[1]))
+                    {
+                        return Collections.singletonList("delete");
                     }
                 }
             }

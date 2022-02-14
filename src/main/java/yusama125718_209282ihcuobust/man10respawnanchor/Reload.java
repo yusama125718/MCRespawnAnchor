@@ -41,7 +41,7 @@ public class Reload extends Thread
         {
             changepitchd = respawnpitchd.get(i);
             changepitch = (float) (changepitchd);
-            respawnyaw.add(changepitch);
+            respawnpitch.add(changepitch);
         }
         respawnworld.addAll(mspawn.getConfig().getStringList("spawnworld"));
         targetworld.addAll(mspawn.getConfig().getStringList("targetworld"));

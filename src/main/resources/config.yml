@@ -1,12 +1,20 @@
 spawnx:
+- 0
 spawny:
+- 0
 spawnz:
+- 0
 spawnyaw:
+- 0
 spawnpitch:
-spwanworld:
-respawnhealth:
-respawnfood:
-respawnmessage:
-system:
+- 0
+spawnworld:
+- world
+targetworld:
+- world
+respawnhealth: 20
+respawnfood: 0
+respawnmessage: null
+system: true
 exceptionworldlist:
 exceptionplayerlist:

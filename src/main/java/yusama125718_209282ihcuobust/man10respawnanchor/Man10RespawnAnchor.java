@@ -58,7 +58,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
         {
             changepitchd = respawnpitchd.get(i);
             changepitch = (float) (changepitchd);
-            respawnyaw.add(changepitch);
+            respawnpitch.add(changepitch);
         }
         respawnworld.addAll(mspawn.getConfig().getStringList("spawnworld"));
         targetworld.addAll(mspawn.getConfig().getStringList("targetworld"));
@@ -159,7 +159,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                 {
                     if (!(sender instanceof Player))
                     {
-                        sender.sendMessage(("§c[manchiro]Player以外は実行できません"));
+                        sender.sendMessage(("§c[Man10Spawn]Player以外は実行できません"));
                         return true;
                     }
                     if (!sender.hasPermission("mspawn.op"))
@@ -434,7 +434,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     {
                         if (!(sender instanceof Player))
                         {
-                            sender.sendMessage(("§c[manchiro]Player以外は実行できません"));
+                            sender.sendMessage(("§c[Man10Spawn]Player以外は実行できません"));
                             return true;
                         }
                         if (!sender.hasPermission("mspawn.op"))
@@ -443,7 +443,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                             return true;
                         }
                         Location pLocation = ((Player) sender).getLocation();
-                        if (targetworld.contains(Objects.requireNonNull(((Player) sender).getPlayer()).getLocation().getWorld().getName()))
+                        eee: if (targetworld.contains(Objects.requireNonNull(((Player) sender).getPlayer()).getLocation().getWorld().getName()))
                         {
                             int i = 0;
                             bbb: for (i=0;i<targetworld.size();i++)
@@ -452,6 +452,14 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                                 {
                                     break bbb;
                                 }
+                                respawnx.add(pLocation.getX());
+                                respawny.add(pLocation.getY());
+                                respawnz.add(pLocation.getZ());
+                                respawnyaw.add(pLocation.getYaw());
+                                respawnpitch.add(pLocation.getPitch());
+                                respawnworld.add(pLocation.getWorld().getName());
+                                targetworld.add(pLocation.getWorld().getName());
+                                break eee;
                             }
                             respawnx.set(i,pLocation.getX());
                             respawny.set(i,pLocation.getY());
@@ -480,6 +488,49 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         mspawn.getConfig().set("targetworld",targetworld);
                         mspawn.saveConfig();
                         sender.sendMessage("§l[§fMan10Spawn§f§l]§eセットしました");
+                        return true;
+                    }
+                }
+                if (args[0].equals("delete"))
+                {
+                    if (args[1].equals("world"))
+                    {
+                        if (!(sender instanceof Player))
+                        {
+                            sender.sendMessage(("§c[Man10Spawn]Player以外は実行できません"));
+                            return true;
+                        }
+                        if (!sender.hasPermission("mspawn.op"))
+                        {
+                            sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
+                            return true;
+                        }
+                        int i = 0;
+                        ccc: for (i=0;i<targetworld.size();i++)
+                        {
+                            if (targetworld.get(i).equals(Objects.requireNonNull(((Player) sender).getPlayer()).getLocation().getWorld().getName()))
+                            {
+                                break ccc;
+                            }
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cこのワールドは登録されていません");
+                            return true;
+                        }
+                        respawnx.remove(i);
+                        respawny.remove(i);
+                        respawnz.remove(i);
+                        respawnyaw.remove(i);
+                        respawnpitch.remove(i);
+                        respawnworld.remove(i);
+                        targetworld.remove(i);
+                        mspawn.getConfig().set("spawnx",respawnx);
+                        mspawn.getConfig().set("spawny",respawny);
+                        mspawn.getConfig().set("spawnz",respawnz);
+                        mspawn.getConfig().set("spawnyaw",respawnyaw);
+                        mspawn.getConfig().set("spawnpitch",respawnpitch);
+                        mspawn.getConfig().set("spawnworld",respawnworld);
+                        mspawn.getConfig().set("targetworld",targetworld);
+                        mspawn.saveConfig();
+                        sender.sendMessage("§l[§fMan10Spawn§f§l]§e削除しました");
                         return true;
                     }
                 }
@@ -542,15 +593,15 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         return true;
                     }
                 }
+                List<String> worlds = new ArrayList<>();
+                java.lang.System.out.println("a");
+                for (int i = 0; i<Bukkit.getWorlds().size(); i++)
+                {
+                    java.lang.System.out.println(i);
+                    worlds.add(Bukkit.getWorlds().get(i).getName());
+                }
                 if (args[0].equals("exceptionw"))
                 {
-                    List<String> worlds = new ArrayList<>();
-                    java.lang.System.out.println("a");
-                    for (int i = 0; i<Bukkit.getWorlds().size(); i++)
-                    {
-                        java.lang.System.out.println(i);
-                        worlds.add(Bukkit.getWorlds().get(i).getName());
-                    }
                     if (args[1].equals("add"))
                     {
                         if (!sender.hasPermission("mspawn.op"))
@@ -601,6 +652,124 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                             mspawn.getConfig().set("exceptionworldlist",exceptionworlds);
                             saveConfig();
                         }
+                        return true;
+                    }
+                }
+                if (args[0].equals("set"))
+                {
+                    if (args[1].equals("world"))
+                    {
+                        if (!(sender instanceof Player))
+                        {
+                            sender.sendMessage(("§c[Man10Spawn]Player以外は実行できません"));
+                            return true;
+                        }
+                        if (!sender.hasPermission("mspawn.op"))
+                        {
+                            sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
+                            return true;
+                        }
+                        String addworld = args[2];
+                        if (!worlds.contains(addworld))
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのワールドは存在しません");
+                            return true;
+                        }
+                        Location pLocation = ((Player) sender).getLocation();
+                        ddd: if (targetworld.contains(addworld))
+                        {
+                            int i = 0;
+                            bbb: for (i=0;i<targetworld.size();i++)
+                            {
+                                if (targetworld.get(i).equals(addworld))
+                                {
+                                    break bbb;
+                                }
+                                respawnx.add(pLocation.getX());
+                                respawny.add(pLocation.getY());
+                                respawnz.add(pLocation.getZ());
+                                respawnyaw.add(pLocation.getYaw());
+                                respawnpitch.add(pLocation.getPitch());
+                                respawnworld.add(pLocation.getWorld().getName());
+                                targetworld.add(pLocation.getWorld().getName());
+                                break ddd;
+                            }
+                            respawnx.set(i,pLocation.getX());
+                            respawny.set(i,pLocation.getY());
+                            respawnz.set(i,pLocation.getZ());
+                            respawnyaw.set(i,pLocation.getYaw());
+                            respawnpitch.set(i,pLocation.getPitch());
+                            respawnworld.set(i,pLocation.getWorld().getName());
+                            targetworld.set(i,pLocation.getWorld().getName());
+                        }
+                        else
+                        {
+                            respawnx.add(pLocation.getX());
+                            respawny.add(pLocation.getY());
+                            respawnz.add(pLocation.getZ());
+                            respawnyaw.add(pLocation.getYaw());
+                            respawnpitch.add(pLocation.getPitch());
+                            respawnworld.add(pLocation.getWorld().getName());
+                            targetworld.add(pLocation.getWorld().getName());
+                        }
+                        mspawn.getConfig().set("spawnx",respawnx);
+                        mspawn.getConfig().set("spawny",respawny);
+                        mspawn.getConfig().set("spawnz",respawnz);
+                        mspawn.getConfig().set("spawnyaw",respawnyaw);
+                        mspawn.getConfig().set("spawnpitch",respawnpitch);
+                        mspawn.getConfig().set("spawnworld",respawnworld);
+                        mspawn.getConfig().set("targetworld",targetworld);
+                        mspawn.saveConfig();
+                        sender.sendMessage("§l[§fMan10Spawn§f§l]§eセットしました");
+                        return true;
+                    }
+                }
+                if (args[0].equals("delete"))
+                {
+                    if (args[1].equals("world"))
+                    {
+                        if (!(sender instanceof Player))
+                        {
+                            sender.sendMessage(("§c[Man10Spawn]Player以外は実行できません"));
+                            return true;
+                        }
+                        if (!sender.hasPermission("mspawn.op"))
+                        {
+                            sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
+                            return true;
+                        }
+                        String deleteworld = args[2];
+                        if (!worlds.contains(deleteworld))
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのワールドは存在しません");
+                            return true;
+                        }
+                        int i = 0;
+                        ccc: for (i=0;i<targetworld.size();i++)
+                        {
+                            if (targetworld.get(i).equals(deleteworld))
+                            {
+                                break ccc;
+                            }
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cこのワールドは登録されていません");
+                            return true;
+                        }
+                        respawnx.remove(i);
+                        respawny.remove(i);
+                        respawnz.remove(i);
+                        respawnyaw.remove(i);
+                        respawnpitch.remove(i);
+                        respawnworld.remove(i);
+                        targetworld.remove(i);
+                        mspawn.getConfig().set("spawnx",respawnx);
+                        mspawn.getConfig().set("spawny",respawny);
+                        mspawn.getConfig().set("spawnz",respawnz);
+                        mspawn.getConfig().set("spawnyaw",respawnyaw);
+                        mspawn.getConfig().set("spawnpitch",respawnpitch);
+                        mspawn.getConfig().set("spawnworld",respawnworld);
+                        mspawn.getConfig().set("targetworld",targetworld);
+                        mspawn.saveConfig();
+                        sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+deleteworld+"の設定を削除しました");
                         return true;
                     }
                 }
@@ -683,7 +852,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     }
                     if (sender.hasPermission("mspawn.op"))
                     {
-                        return Arrays.asList("exception","exceptionw","message","off","on","reload","respawn","set","setfood","sethealth");
+                        return Arrays.asList("delete","exception","exceptionw","message","off","on","reload","respawn","set","setfood","sethealth");
                     }
                 }
                 else
@@ -750,6 +919,10 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     {
                         return Collections.singletonList("setfood");
                     }
+                    if ("delete".startsWith(args[0]))
+                    {
+                        return Collections.singletonList("delete");
+                    }
                 }
             }
             if (args.length == 2)
@@ -767,6 +940,10 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     else if (args[0].equals("exceptionw")||args[0].equals("exception"))
                     {
                         return Arrays.asList("add","delete");
+                    }
+                    else if (args[0].equals("set")||args[0].equals("delete"))
+                    {
+                        return Collections.singletonList("world");
                     }
                 }
                 else if (args[0].equals("exceptionw")||args[0].equals("exception"))
@@ -793,14 +970,21 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
             {
                 if (args[2].length() == 0)
                 {
+                    ArrayList<String> list = new ArrayList<>();
+                    for (World world : Bukkit.getWorlds())
+                    {
+                        list.add(world.getName());
+                    }
                     if (args[0].equals("exceptionw"))
                     {
-                        ArrayList<String> list = new ArrayList<>();
-                        for (World world : Bukkit.getWorlds())
-                        {
-                            list.add(world.getName());
-                        }
                         return list;
+                    }
+                    else if (args[0].equals("set")||args[0].equals("delete"))
+                    {
+                        if (args[1].equals("world"))
+                        {
+                            return list;
+                        }
                     }
                 }
             }

@@ -33,6 +33,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
     public static String respawnmessage;
     public static boolean System;
     public static boolean JoinSystem;
+    public static boolean cpenalty;
     public static List<UUID> exceptionplayers = new ArrayList<>();
     public static List<String> exceptionworlds = new ArrayList<>();
 
@@ -171,8 +172,11 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn delete world : mspanwのそのワールド固有のspawn地点を削除します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn delete world [ワールド名] : mspanwの指定したワールド固有のspawn地点を削除します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn reload : configをリロードします");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn joinon : サーバー入室時のリスポーン地点をmspawnのリスポーン地点にします");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn joinoff : サーバー入室時のリスポーン地点をmspawnのリスポーン地点から解除します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn on : mspawnを有効化します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn off : mspawnを無効化します");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn cpena [true/false] : コマンドでのリスポーン時のデスペナルティを設定します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exception add [ユーザー名] : mspawnを無効化するプレイヤーを追加します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exception delete [ユーザー名] : mspawnを無効化するプレイヤーから除外します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exceptionw add [ワールド名] : mspawnを無効化するワールドを追加します");
@@ -243,16 +247,16 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     }
                     respawnplayer = ((Player) sender).getPlayer();
                     int i=0;
-                    aaa: for (int k = 0;k<1;k++)
+                    aaa: for (i=0;i < targetworld.size();i++)
                     {
-                        for (i=0;i < targetworld.size();i++)
+                        if (((respawnplayer.getLocation()).getWorld()).getName().equals(targetworld.get(i)))
                         {
-                            if (((respawnplayer.getLocation()).getWorld()).getName().equals(targetworld.get(i)))
-                            {
-                                break aaa;
-                            }
+                            break aaa;
                         }
-                        i = 0;
+                    }
+                    if (i>=targetworld.size())
+                    {
+                        i=0;
                     }
                     Location respawnlocation = respawnplayer.getLocation();
                     respawnlocation.setX(respawnx.get(i));
@@ -262,6 +266,12 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     respawnlocation.setPitch(respawnpitch.get(i));
                     respawnlocation.setWorld(Bukkit.getWorld(respawnworld.get(i)));
                     respawnplayer.teleport(respawnlocation);
+                    if (cpenalty)
+                    {
+                        respawnplayer.setHealth(respawnhealth);
+                        respawnplayer.setFoodLevel(respawnfood);
+                        respawnplayer.sendMessage(respawnmessage);
+                    }
                     sender.sendMessage("§l[§fMan10Spawn§f§l]§eリスポーンしました");
                     return true;
                 }
@@ -289,6 +299,19 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
             }
             case 2:
             {
+                if (args[0].equals("cpena"))
+                {
+                    if (args[1].equals("true"))
+                    {
+                        cpenalty = true;
+                        sender.sendMessage("§l[§fMan10Spawn§f§l]§eコマンド使用時のペナルティをONにしました");
+                    }
+                    if (args[1].equals("false"))
+                    {
+                        cpenalty = false;
+                        sender.sendMessage("§l[§fMan10Spawn§f§l]§eコマンド使用時のペナルティをOFFにしました");
+                    }
+                }
                 if (args[0].equals("respawn"))
                 {
                     if (!System)
@@ -755,8 +778,11 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn delete world : mspanwのそのワールド固有のspawn地点を削除します");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn delete world [ワールド名] : mspanwの指定したワールド固有のspawn地点を削除します");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn reload : configをリロードします");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn joinon : サーバー入室時のリスポーン地点をmspawnのリスポーン地点にします");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn joinoff : サーバー入室時のリスポーン地点をmspawnのリスポーン地点から解除します");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn on : mspawnを有効化します");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn off : mspawnを無効化します");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn cpena [true/false] : コマンドでのリスポーン時のデスペナルティを設定します");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exception add [ユーザー名] : mspawnを無効化するプレイヤーを追加します");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exception delete [ユーザー名] : mspawnを無効化するプレイヤーから除外します");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exceptionw add [ワールド名] : mspawnを無効化するワールドを追加します");
@@ -844,7 +870,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     }
                     if (sender.hasPermission("mspawn.op"))
                     {
-                        return Arrays.asList("delete","exception","exceptionw","joinoff","joinon","message","off","on","reload","respawn","set","setfood","sethealth");
+                        return Arrays.asList("cpena","delete","exception","exceptionw","joinoff","joinon","message","off","on","reload","respawn","set","setfood","sethealth");
                     }
                 }
                 else
@@ -867,6 +893,10 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     if ("respawn".startsWith(args[0]))
                     {
                         return Collections.singletonList("respawn");
+                    }
+                    if ("cpena".startsWith(args[0]))
+                    {
+                        return Collections.singletonList("cpena");
                     }
                     if ("reload".startsWith(args[0]))
                     {
@@ -948,6 +978,10 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     else if (args[0].equals("set")||args[0].equals("delete"))
                     {
                         return Collections.singletonList("world");
+                    }
+                    else if (args[0].equals("cpena"))
+                    {
+                        return Arrays.asList("true","false");
                     }
                 }
                 else if (args[0].equals("exceptionw")||args[0].equals("exception"))

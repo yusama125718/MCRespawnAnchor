@@ -29,6 +29,12 @@ public class Respawn extends Thread
         respawnlocation.setPitch(respawnpitch.get(i));
         respawnlocation.setWorld(Bukkit.getWorld(respawnworld.get(i)));
         respawnplayer.teleport(respawnlocation);
+        if (cpenalty)
+        {
+            respawnplayer.setHealth(respawnhealth);
+            respawnplayer.setFoodLevel(respawnfood);
+            respawnplayer.sendMessage(respawnmessage);
+        }
         respawnplayer.sendMessage("§l[§fMan10Spawn§f§l]§eリスポーンしました");
     }
 }

@@ -58,6 +58,8 @@ public class Reload extends Thread
         respawnmessage = mspawn.getConfig().getString("respawnmessage");
         System = mspawn.getConfig().getBoolean("system");
         JoinSystem = mspawn.getConfig().getBoolean("joinsystem");
+        cpenalty = mspawn.getConfig().getBoolean("cpenalty");
+        dpenalty = mspawn.getConfig().getBoolean("dpenalty");
         try
         {
             for (int i = 0; i < mspawn.getConfig().getList("exceptionplayerlist").size(); i++)

@@ -34,6 +34,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
     public static boolean System;
     public static boolean JoinSystem;
     public static boolean cpenalty;
+    public static boolean dpenalty;
     public static List<UUID> exceptionplayers = new ArrayList<>();
     public static List<String> exceptionworlds = new ArrayList<>();
 
@@ -77,6 +78,9 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
         respawnfood = mspawn.getConfig().getInt("respawnfood");
         respawnmessage = mspawn.getConfig().getString("respawnmessage");
         System = mspawn.getConfig().getBoolean("system");
+        JoinSystem = mspawn.getConfig().getBoolean("joinsystem");
+        cpenalty = mspawn.getConfig().getBoolean("cpenalty");
+        dpenalty = mspawn.getConfig().getBoolean("dpenalty");
         try
         {
             for (int i = 0; i < mspawn.getConfig().getList("exceptionplayerlist").size(); i++)
@@ -826,15 +830,18 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
         respawnlocation.setPitch(respawnpitch.get(i));
         respawnlocation.setWorld(Bukkit.getWorld(respawnworld.get(i)));
         event.setRespawnLocation(respawnlocation);
-        Bukkit.getScheduler().runTaskLater(this, new Runnable()
+        if (dpenalty)
         {
-            @Override
-            public void run() {
-                event.getPlayer().setHealth(respawnhealth);
-                event.getPlayer().setFoodLevel(respawnfood);
-                event.getPlayer().sendMessage(respawnmessage);
-            }
-        }, 1);
+            Bukkit.getScheduler().runTaskLater(this, new Runnable()
+            {
+                @Override
+                public void run() {
+                    event.getPlayer().setHealth(respawnhealth);
+                    event.getPlayer().setFoodLevel(respawnfood);
+                    event.getPlayer().sendMessage(respawnmessage);
+                }
+            }, 1);
+        }
     }
 
     @EventHandler

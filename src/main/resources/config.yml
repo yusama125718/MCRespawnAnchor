@@ -17,5 +17,7 @@ respawnfood: 0
 respawnmessage: null
 system: true
 joinsystem: true
+cpenalty: false
+dpenalty: false
 exceptionworldlist:
 exceptionplayerlist:

@@ -9,6 +9,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -31,6 +32,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
     public static Player respawnplayer;
     public static String respawnmessage;
     public static boolean System;
+    public static boolean JoinSystem;
     public static List<UUID> exceptionplayers = new ArrayList<>();
     public static List<String> exceptionworlds = new ArrayList<>();
 
@@ -133,6 +135,30 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     System = false;
                     mspawn.getConfig().set("system",false);
                     sender.sendMessage("§l[§fMan10Spawn§f§l]§eOFFにしました");
+                    saveConfig();
+                }
+                if (args[0].equals("joinon"))
+                {
+                    if (!sender.hasPermission("mspawn.op"))
+                    {
+                        sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
+                        return true;
+                    }
+                    JoinSystem = true;
+                    mspawn.getConfig().set("joinsystem",true);
+                    sender.sendMessage("§l[§fMan10Spawn§f§l]§e入室時の設定をONにしました");
+                    saveConfig();
+                }
+                if (args[0].equals("joinoff"))
+                {
+                    if (!sender.hasPermission("mspawn.op"))
+                    {
+                        sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
+                        return true;
+                    }
+                    JoinSystem = false;
+                    mspawn.getConfig().set("joinsystem",false);
+                    sender.sendMessage("§l[§fMan10Spawn§f§l]§e入室時の設定をOFFにしました");
                     saveConfig();
                 }
                 if (args[0].equals("help"))
@@ -785,6 +811,24 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
         }, 1);
     }
 
+    @EventHandler
+    public void PlayerJoinEvent(PlayerJoinEvent joinEvent)
+    {
+        if (!JoinSystem)
+        {
+            return;
+        }
+        Player joinplayer = joinEvent.getPlayer();
+        Location joinlocation = joinplayer.getLocation();
+        joinlocation.setX(respawnx.get(0));
+        joinlocation.setY(respawny.get(0));
+        joinlocation.setZ(respawnz.get(0));
+        joinlocation.setYaw(respawnyaw.get(0));
+        joinlocation.setPitch(respawnpitch.get(0));
+        joinlocation.setWorld(Bukkit.getWorld(respawnworld.get(0)));
+        joinplayer.teleport(joinlocation);
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args)
     {
@@ -800,7 +844,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     }
                     if (sender.hasPermission("mspawn.op"))
                     {
-                        return Arrays.asList("delete","exception","exceptionw","message","off","on","reload","respawn","set","setfood","sethealth");
+                        return Arrays.asList("delete","exception","exceptionw","joinoff","joinon","message","off","on","reload","respawn","set","setfood","sethealth");
                     }
                 }
                 else
@@ -830,6 +874,18 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         {
                             return Collections.singletonList("reload");
                         }
+                    }
+                    else if ("joinon".startsWith(args[0]) && "joinoff".startsWith(args[0]))
+                    {
+                        return Arrays.asList("joinon","joinoff");
+                    }
+                    else if("joinon".startsWith(args[0]))
+                    {
+                        return Collections.singletonList("joinon");
+                    }
+                    else if("joinoff".startsWith(args[0]))
+                    {
+                        return Collections.singletonList("off");
                     }
                     else if ("on".startsWith(args[0]) && "off".startsWith(args[0]))
                     {

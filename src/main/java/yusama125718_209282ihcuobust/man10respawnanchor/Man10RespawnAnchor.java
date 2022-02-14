@@ -316,6 +316,19 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         sender.sendMessage("§l[§fMan10Spawn§f§l]§eコマンド使用時のペナルティをOFFにしました");
                     }
                 }
+                if (args[0].equals("dpena"))
+                {
+                    if (args[1].equals("true"))
+                    {
+                        cpenalty = true;
+                        sender.sendMessage("§l[§fMan10Spawn§f§l]§e死亡時のペナルティをONにしました");
+                    }
+                    if (args[1].equals("false"))
+                    {
+                        cpenalty = false;
+                        sender.sendMessage("§l[§fMan10Spawn§f§l]§e死亡時のペナルティをOFFにしました");
+                    }
+                }
                 if (args[0].equals("respawn"))
                 {
                     if (!System)
@@ -877,7 +890,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     }
                     if (sender.hasPermission("mspawn.op"))
                     {
-                        return Arrays.asList("cpena","delete","exception","exceptionw","joinoff","joinon","message","off","on","reload","respawn","set","setfood","sethealth");
+                        return Arrays.asList("cpena","dpana","delete","exception","exceptionw","joinoff","joinon","message","off","on","reload","respawn","set","setfood","sethealth");
                     }
                 }
                 else
@@ -960,7 +973,15 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     {
                         return Collections.singletonList("setfood");
                     }
-                    if ("delete".startsWith(args[0]))
+                    else if ("delete".startsWith(args[0])&&"dpena".startsWith(args[0]))
+                    {
+                        return Arrays.asList("set","sethealth","setfood");
+                    }
+                    else if ("dpena".startsWith(args[0]))
+                    {
+                        return Collections.singletonList("dpena");
+                    }
+                    else if ("delete".startsWith(args[0]))
                     {
                         return Collections.singletonList("delete");
                     }
@@ -986,7 +1007,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     {
                         return Collections.singletonList("world");
                     }
-                    else if (args[0].equals("cpena"))
+                    else if (args[0].equals("cpena")||args[0].equals("dpena"))
                     {
                         return Arrays.asList("true","false");
                     }
@@ -1009,6 +1030,17 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                 else if (args[0].equals("set"))
                 {
                     return Collections.singletonList("world");
+                }
+                else if (args[0].equals("cpena")||args[0].equals("dpena"))
+                {
+                    if ("true".startsWith(args[1]))
+                    {
+                        return Collections.singletonList("true");
+                    }
+                    else if ("false".startsWith(args[1]))
+                    {
+                        return Collections.singletonList("false");
+                    }
                 }
             }
             if (args.length == 3)

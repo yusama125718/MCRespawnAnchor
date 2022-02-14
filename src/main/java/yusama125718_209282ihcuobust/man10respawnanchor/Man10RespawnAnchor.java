@@ -16,23 +16,23 @@ import java.util.*;
 
 public final class Man10RespawnAnchor extends JavaPlugin implements Listener, CommandExecutor, TabCompleter
 {
-    JavaPlugin mspawn;
-    List<Float> respawnyaw = new ArrayList<>();
-    List<Double> respawnx = new ArrayList<>();
-    List<Double> respawny = new ArrayList<>();
-    List<Double> respawnz = new ArrayList<>();
-    List<Float> respawnpitch = new ArrayList<>();
-    List<String> respawnworld = new ArrayList<>();
-    List<String> targetworld = new ArrayList<>();
-    List<Double> respawnyawd = new ArrayList<>();
-    List<Double> respawnpitchd = new ArrayList<>();
-    double respawnhealth;
-    int respawnfood;
-    Player respawnplayer;
-    String respawnmessage;
-    boolean System;
-    List<UUID> exceptionplayers = new ArrayList<>();
-    List<String> exceptionworlds = new ArrayList<>();
+    public static JavaPlugin mspawn;
+    public static List<Float> respawnyaw = new ArrayList<>();
+    public static List<Double> respawnx = new ArrayList<>();
+    public static List<Double> respawny = new ArrayList<>();
+    public static List<Double> respawnz = new ArrayList<>();
+    public static List<Float> respawnpitch = new ArrayList<>();
+    public static List<String> respawnworld = new ArrayList<>();
+    public static List<String> targetworld = new ArrayList<>();
+    public static List<Double> respawnyawd = new ArrayList<>();
+    public static List<Double> respawnpitchd = new ArrayList<>();
+    public static double respawnhealth;
+    public static int respawnfood;
+    public static Player respawnplayer;
+    public static String respawnmessage;
+    public static boolean System;
+    public static List<UUID> exceptionplayers = new ArrayList<>();
+    public static List<String> exceptionworlds = new ArrayList<>();
 
     @Override
     public void onEnable()
@@ -140,7 +140,10 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     if (sender.hasPermission("mspawn.op"))
                     {
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set : mspanwのデフォルトのspawn地点を現在地にセットします");
-                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set world : mspanwのそのワールドのspawn地点を現在地にセットします");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set world : mspanwのそのワールド固有のspawn地点を現在地にセットします");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set world [ワールド名] : mspanwの指定したワールド固有のspawn地点を現在地にセットします");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn delete world : mspanwのそのワールド固有のspawn地点を削除します");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn delete world [ワールド名] : mspanwの指定したワールド固有のspawn地点を削除します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn reload : configをリロードします");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn on : mspawnを有効化します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn off : mspawnを無効化します");
@@ -154,6 +157,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn respawn [ユーザー名] : 特定のユーザーをリスポーンします");
                     }
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn respawn : リスポーンします");
+                    return true;
                 }
                 if (args[0].equals("set"))
                 {
@@ -242,73 +246,15 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
                         return true;
                     }
-                    respawnyaw.clear();
-                    respawnyawd.clear();
-                    respawnx.clear();
-                    respawny.clear();
-                    respawnz.clear();
-                    respawnpitch.clear();
-                    respawnpitchd.clear();
-                    respawnworld.clear();
-                    exceptionplayers.clear();
-                    exceptionworlds.clear();
-                    mspawn.reloadConfig();
-                    respawnyawd.addAll(mspawn.getConfig().getDoubleList("spawnyaw"));
-                    double changeyawd;
-                    float changeyaw;
-                    for (int i = 0;i<(mspawn.getConfig().getDoubleList("spawnyaw")).size();i++)
-                    {
-                        changeyawd = respawnyawd.get(i);
-                        changeyaw = (float) (changeyawd);
-                        respawnyaw.add(changeyaw);
-                    }
-                    respawnx.addAll(mspawn.getConfig().getDoubleList("spawnx"));
-                    respawny.addAll(mspawn.getConfig().getDoubleList("spawny"));
-                    respawnz.addAll(mspawn.getConfig().getDoubleList("spawnz"));
-                    respawnpitchd.addAll(mspawn.getConfig().getDoubleList("spawnpitch"));
-                    double changepitchd;
-                    float changepitch;
-                    for (int i = 0;i<(mspawn.getConfig().getDoubleList("spawnpitch")).size();i++)
-                    {
-                        changepitchd = respawnpitchd.get(i);
-                        changepitch = (float) (changepitchd);
-                        respawnyaw.add(changepitch);
-                    }
-                    respawnworld.addAll(mspawn.getConfig().getStringList("spawnworld"));
-                    targetworld.addAll(mspawn.getConfig().getStringList("targetworld"));
-                    respawnhealth = mspawn.getConfig().getDouble("respawnhealth");
-                    if (respawnhealth>20)
-                    {
-                        respawnhealth = 20;
-                    }
-                    if (respawnhealth<1)
-                    {
-                        respawnhealth = 1;
-                    }
-                    respawnfood = mspawn.getConfig().getInt("respawnfood");
-                    respawnmessage = mspawn.getConfig().getString("respawnmessage");
-                    System = mspawn.getConfig().getBoolean("system");
+                    Reload reload = new Reload();
+                    reload.start();
                     try
                     {
-                        for (int i = 0; i < mspawn.getConfig().getList("exceptionplayerlist").size(); i++)
-                        {
-                            exceptionplayers.add((UUID) (mspawn.getConfig().getList("exceptionplayerlist")).get(i));
-                        }
+                        reload.join();
                     }
-                    catch (NullPointerException e)
+                    catch (InterruptedException e)
                     {
-                        Bukkit.broadcast("§l[§fMan10Spawn§f§l]§r除外するプレイヤーのロードに失敗しました","mspawn.op");
-                    }
-                    try
-                    {
-                        for (int i = 0; i < mspawn.getConfig().getList("exceptionworldlist").size(); i++)
-                        {
-                            exceptionworlds.add((String) Objects.requireNonNull(mspawn.getConfig().getList("exceptionworldlist")).get(i));
-                        }
-                    }
-                    catch (NullPointerException e)
-                    {
-                        Bukkit.broadcast("§l[§fMan10Spawn§f§l]§r除外するワールドのロードに失敗しました","mspawn.op");
+                        e.printStackTrace();
                     }
                     sender.sendMessage("§l[§fMan10Spawn§f§l]§eリロードしました");
                     return true;
@@ -335,28 +281,17 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのプレイヤーは存在しません");
                         return true;
                     }
-                    int i=0;
-                    aaa: for (int k = 0;k<1;k++)
+                    Respawn respawn = new Respawn();
+                    respawn.start();
+                    try
                     {
-                        for (i=0;i < targetworld.size();i++)
-                        {
-                            if (((respawnplayer.getLocation()).getWorld()).getName().equals(targetworld.get(i)))
-                            {
-                                break aaa;
-                            }
-                        }
-                        i = 0;
+                        respawn.join();
                     }
-                    Location respawnlocation = respawnplayer.getLocation();
-                    respawnlocation.setX(respawnx.get(i));
-                    respawnlocation.setY(respawny.get(i));
-                    respawnlocation.setZ(respawnz.get(i));
-                    respawnlocation.setYaw(respawnyaw.get(i));
-                    respawnlocation.setPitch(respawnpitch.get(i));
-                    respawnlocation.setWorld(Bukkit.getWorld(respawnworld.get(i)));
-                    respawnplayer.teleport(respawnlocation);
+                    catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
                     sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+respawnplayer.getName()+"をリスポーンしました");
-                    respawnplayer.sendMessage("§l[§fMan10Spawn§f§l]§eリスポーンしました");
                     return true;
                 }
                 if (args[0].equals("sethealth"))
@@ -443,33 +378,20 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                             return true;
                         }
                         Location pLocation = ((Player) sender).getLocation();
-                        eee: if (targetworld.contains(Objects.requireNonNull(((Player) sender).getPlayer()).getLocation().getWorld().getName()))
+                        int i = 0;
+                        bbb: for (i=0;i<targetworld.size();i++)
                         {
-                            int i = 0;
-                            bbb: for (i=0;i<targetworld.size();i++)
+                            if (Objects.requireNonNull(((Player) sender).getPlayer()).getLocation().getWorld().getName().equals(targetworld.get(i)))
                             {
-                                if (targetworld.get(i).equals(Objects.requireNonNull(((Player) sender).getPlayer()).getLocation().getWorld().getName()))
-                                {
-                                    break bbb;
-                                }
-                                respawnx.add(pLocation.getX());
-                                respawny.add(pLocation.getY());
-                                respawnz.add(pLocation.getZ());
-                                respawnyaw.add(pLocation.getYaw());
-                                respawnpitch.add(pLocation.getPitch());
-                                respawnworld.add(pLocation.getWorld().getName());
-                                targetworld.add(pLocation.getWorld().getName());
-                                break eee;
+                                break bbb;
                             }
-                            respawnx.set(i,pLocation.getX());
-                            respawny.set(i,pLocation.getY());
-                            respawnz.set(i,pLocation.getZ());
-                            respawnyaw.set(i,pLocation.getYaw());
-                            respawnpitch.set(i,pLocation.getPitch());
-                            respawnworld.set(i,pLocation.getWorld().getName());
-                            targetworld.set(i,pLocation.getWorld().getName());
                         }
-                        else
+                        if (i==0)
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§c"+Objects.requireNonNull(((Player) sender).getPlayer()).getLocation().getWorld().getName()+"はデフォルトのスポーン設定です");
+                            return true;
+                        }
+                        if (i>targetworld.size()-1)
                         {
                             respawnx.add(pLocation.getX());
                             respawny.add(pLocation.getY());
@@ -478,6 +400,16 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                             respawnpitch.add(pLocation.getPitch());
                             respawnworld.add(pLocation.getWorld().getName());
                             targetworld.add(pLocation.getWorld().getName());
+                        }
+                        else
+                        {
+                            respawnx.set(i,pLocation.getX());
+                            respawny.set(i,pLocation.getY());
+                            respawnz.set(i,pLocation.getZ());
+                            respawnyaw.set(i,pLocation.getYaw());
+                            respawnpitch.set(i,pLocation.getPitch());
+                            respawnworld.set(i,pLocation.getWorld().getName());
+                            targetworld.set(i,pLocation.getWorld().getName());
                         }
                         mspawn.getConfig().set("spawnx",respawnx);
                         mspawn.getConfig().set("spawny",respawny);
@@ -508,11 +440,19 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         int i = 0;
                         ccc: for (i=0;i<targetworld.size();i++)
                         {
-                            if (targetworld.get(i).equals(Objects.requireNonNull(((Player) sender).getPlayer()).getLocation().getWorld().getName()))
+                            if (Objects.requireNonNull(((Player) sender).getPlayer()).getLocation().getWorld().getName().equals(targetworld.get(i)))
                             {
                                 break ccc;
                             }
+                        }
+                        if (i>targetworld.size())
+                        {
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§cこのワールドは登録されていません");
+                            return true;
+                        }
+                        if (i==0)
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§c"+ Objects.requireNonNull(((Player) sender).getPlayer()).getLocation().getWorld().getName()+"はデフォルトのスポーン設定です");
                             return true;
                         }
                         respawnx.remove(i);
@@ -676,33 +616,20 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                             return true;
                         }
                         Location pLocation = ((Player) sender).getLocation();
-                        ddd: if (targetworld.contains(addworld))
+                        int i = 0;
+                        bbb: for (i=0;i<targetworld.size();i++)
                         {
-                            int i = 0;
-                            bbb: for (i=0;i<targetworld.size();i++)
+                            if (addworld.equals(targetworld.get(i)))
                             {
-                                if (targetworld.get(i).equals(addworld))
-                                {
-                                    break bbb;
-                                }
-                                respawnx.add(pLocation.getX());
-                                respawny.add(pLocation.getY());
-                                respawnz.add(pLocation.getZ());
-                                respawnyaw.add(pLocation.getYaw());
-                                respawnpitch.add(pLocation.getPitch());
-                                respawnworld.add(pLocation.getWorld().getName());
-                                targetworld.add(pLocation.getWorld().getName());
-                                break ddd;
+                                break bbb;
                             }
-                            respawnx.set(i,pLocation.getX());
-                            respawny.set(i,pLocation.getY());
-                            respawnz.set(i,pLocation.getZ());
-                            respawnyaw.set(i,pLocation.getYaw());
-                            respawnpitch.set(i,pLocation.getPitch());
-                            respawnworld.set(i,pLocation.getWorld().getName());
-                            targetworld.set(i,pLocation.getWorld().getName());
                         }
-                        else
+                        if (i==0)
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§c"+addworld+"はデフォルトのスポーン設定です");
+                            return true;
+                        }
+                        if (i>targetworld.size()-1)
                         {
                             respawnx.add(pLocation.getX());
                             respawny.add(pLocation.getY());
@@ -710,7 +637,17 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                             respawnyaw.add(pLocation.getYaw());
                             respawnpitch.add(pLocation.getPitch());
                             respawnworld.add(pLocation.getWorld().getName());
-                            targetworld.add(pLocation.getWorld().getName());
+                            targetworld.add(addworld);
+                        }
+                        else
+                        {
+                            respawnx.set(i,pLocation.getX());
+                            respawny.set(i,pLocation.getY());
+                            respawnz.set(i,pLocation.getZ());
+                            respawnyaw.set(i,pLocation.getYaw());
+                            respawnpitch.set(i,pLocation.getPitch());
+                            respawnworld.set(i,pLocation.getWorld().getName());
+                            targetworld.set(i,addworld);
                         }
                         mspawn.getConfig().set("spawnx",respawnx);
                         mspawn.getConfig().set("spawny",respawny);
@@ -747,11 +684,19 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         int i = 0;
                         ccc: for (i=0;i<targetworld.size();i++)
                         {
-                            if (targetworld.get(i).equals(deleteworld))
+                            if (deleteworld.equals(targetworld.get(i)))
                             {
                                 break ccc;
                             }
+                        }
+                        if (i>targetworld.size())
+                        {
                             sender.sendMessage("§l[§fMan10Spawn§f§l]§cこのワールドは登録されていません");
+                            return true;
+                        }
+                        if (i==0)
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§c"+deleteworld+"はデフォルトのスポーン設定です");
                             return true;
                         }
                         respawnx.remove(i);
@@ -779,7 +724,10 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                 if (sender.hasPermission("mspawn.op"))
                 {
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set : mspanwのデフォルトのspawn地点を現在地にセットします");
-                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set world : mspanwのそのワールドのspawn地点を現在地にセットします");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set world : mspanwのそのワールド固有のspawn地点を現在地にセットします");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn set world [ワールド名] : mspanwの指定したワールド固有のspawn地点を現在地にセットします");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn delete world : mspanwのそのワールド固有のspawn地点を削除します");
+                    sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn delete world [ワールド名] : mspanwの指定したワールド固有のspawn地点を削除します");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn reload : configをリロードします");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn on : mspawnを有効化します");
                     sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn off : mspawnを無効化します");
@@ -807,16 +755,16 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
             return;
         }
         int i=0;
-        aaa: for (int k = 0;k<1;k++)
+        aaa: for (i=0;i < targetworld.size();i++)
         {
-            for (i=0;i < targetworld.size();i++)
+            if (((event.getPlayer().getLocation()).getWorld()).getName().equals(targetworld.get(i)))
             {
-                if (((event.getPlayer().getLocation()).getWorld()).getName().equals(targetworld.get(i)))
-                {
-                    break aaa;
-                }
+                break aaa;
             }
-            i = 0;
+        }
+        if (i>=targetworld.size())
+        {
+            i=0;
         }
         Location respawnlocation = event.getRespawnLocation();
         respawnlocation.setX(respawnx.get(i));

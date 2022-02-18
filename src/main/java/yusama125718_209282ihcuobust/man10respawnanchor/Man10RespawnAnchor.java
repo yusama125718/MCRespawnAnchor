@@ -31,12 +31,13 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
     public static int respawnfood;
     public static Player respawnplayer;
     public static String respawnmessage;
-    public static boolean System;
+    public static boolean system;
     public static boolean JoinSystem;
     public static boolean cpenalty;
     public static boolean dpenalty;
     public static List<UUID> exceptionplayers = new ArrayList<>();
     public static List<String> exceptionworlds = new ArrayList<>();
+    List<String> exceptiondpenaworlds;
 
     @Override
     public void onEnable()
@@ -77,7 +78,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
         }
         respawnfood = mspawn.getConfig().getInt("respawnfood");
         respawnmessage = mspawn.getConfig().getString("respawnmessage");
-        System = mspawn.getConfig().getBoolean("system");
+        system = mspawn.getConfig().getBoolean("system");
         JoinSystem = mspawn.getConfig().getBoolean("joinsystem");
         cpenalty = mspawn.getConfig().getBoolean("cpenalty");
         dpenalty = mspawn.getConfig().getBoolean("dpenalty");
@@ -90,7 +91,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
         }
         catch (NullPointerException e)
         {
-            Bukkit.broadcast("§l[§fMan10Spawn§f§l]§r除外するプレイヤーのロードに失敗しました","mspawn.op");
+            System.out.println("§l[§fMan10Spawn§f§l]§r除外するプレイヤーのロードに失敗しました");
         }
         try
         {
@@ -101,7 +102,17 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
         }
         catch (NullPointerException e)
         {
-            Bukkit.broadcast("§l[§fMan10Spawn§f§l]§r除外するワールドのロードに失敗しました","mspawn.op");
+            java.lang.System.out.println("§l[§fMan10Spawn§f§l]§r除外するワールドのロードに失敗しました");
+        }
+        cpenalty = mspawn.getConfig().getBoolean("cpenalty");
+        dpenalty = mspawn.getConfig().getBoolean("dpenalty");
+        try
+        {
+            exceptiondpenaworlds.addAll(mspawn.getConfig().getStringList("exceptiondpenaworlds"));
+        }
+        catch (NullPointerException e)
+        {
+            java.lang.System.out.println("§l[§fMan10Spawn§f§l]§r除外するワールドのロードに失敗しました");
         }
         getServer().getPluginManager().registerEvents(this, this);
     }
@@ -125,7 +136,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
                         return true;
                     }
-                    System = true;
+                    system = true;
                     mspawn.getConfig().set("system",true);
                     sender.sendMessage("§l[§fMan10Spawn§f§l]§eONにしました");
                     saveConfig();
@@ -137,7 +148,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
                         return true;
                     }
-                    System = false;
+                    system = false;
                     mspawn.getConfig().set("system",false);
                     sender.sendMessage("§l[§fMan10Spawn§f§l]§eOFFにしました");
                     saveConfig();
@@ -181,6 +192,8 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn on : mspawnを有効化します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn off : mspawnを無効化します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn cpena [true/false] : コマンドでのリスポーン時のデスペナルティを設定します");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn dpena [true/false] : 死亡でのリスポーン時のデスペナルティを設定します");
+                        sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn dpena [add/delete] [world名] : 死亡でのリスポーン時のデスペナルティを無効化するワールドを設定します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exception add [ユーザー名] : mspawnを無効化するプレイヤーを追加します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exception delete [ユーザー名] : mspawnを無効化するプレイヤーから除外します");
                         sender.sendMessage("§l[§fMan10Spawn§f§l] §7/mspawn exceptionw add [ワールド名] : mspawnを無効化するワールドを追加します");
@@ -239,7 +252,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                 }
                 if (args[0].equals("respawn"))
                 {
-                    if (!System)
+                    if (!system)
                     {
                         sender.sendMessage(("§l[§fMan10Spawn§f§l]§c現在OFFです"));
                         return true;
@@ -308,11 +321,15 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     if (args[1].equals("true"))
                     {
                         cpenalty = true;
+                        mspawn.getConfig().set("cpenalty",cpenalty);
+                        saveConfig();
                         sender.sendMessage("§l[§fMan10Spawn§f§l]§eコマンド使用時のペナルティをONにしました");
                     }
                     if (args[1].equals("false"))
                     {
                         cpenalty = false;
+                        mspawn.getConfig().set("cpenalty",cpenalty);
+                        saveConfig();
                         sender.sendMessage("§l[§fMan10Spawn§f§l]§eコマンド使用時のペナルティをOFFにしました");
                     }
                 }
@@ -320,18 +337,22 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                 {
                     if (args[1].equals("true"))
                     {
-                        cpenalty = true;
+                        dpenalty = true;
+                        mspawn.getConfig().set("dpenalty",dpenalty);
+                        saveConfig();
                         sender.sendMessage("§l[§fMan10Spawn§f§l]§e死亡時のペナルティをONにしました");
                     }
                     if (args[1].equals("false"))
                     {
-                        cpenalty = false;
+                        dpenalty = false;
+                        mspawn.getConfig().set("dpenalty",dpenalty);
+                        saveConfig();
                         sender.sendMessage("§l[§fMan10Spawn§f§l]§e死亡時のペナルティをOFFにしました");
                     }
                 }
                 if (args[0].equals("respawn"))
                 {
-                    if (!System)
+                    if (!system)
                     {
                         sender.sendMessage(("§l[§fMan10Spawn§f§l]§c現在OFFです"));
                         return true;
@@ -600,10 +621,8 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                     }
                 }
                 List<String> worlds = new ArrayList<>();
-                java.lang.System.out.println("a");
                 for (int i = 0; i<Bukkit.getWorlds().size(); i++)
                 {
-                    java.lang.System.out.println(i);
                     worlds.add(Bukkit.getWorlds().get(i).getName());
                 }
                 if (args[0].equals("exceptionw"))
@@ -784,6 +803,47 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         return true;
                     }
                 }
+                if (args[0].equals("dpena"))
+                {
+                    if (args[1].equals("add"))
+                    {
+                        if (!sender.hasPermission("mspawn.op"))
+                        {
+                            sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
+                            return true;
+                        }
+                        String addworld = args[2];
+                        if (!worlds.contains(addworld))
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのワールドは存在しません");
+                            return true;
+                        }
+                        exceptiondpenaworlds.add(addworld);
+                        mspawn.getConfig().set("exceptiondpenaworlds",exceptiondpenaworlds);
+                        saveConfig();
+                        sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+addworld+"の死亡時のペナルティをOFFにしました");
+                        return true;
+                    }
+                    if (args[1].equals("delete"))
+                    {
+                        if (!sender.hasPermission("mspawn.op"))
+                        {
+                            sender.sendMessage("§c[Man10Spawn]You don't have permissions!");
+                            return true;
+                        }
+                        String deleteworld = args[2];
+                        if (!worlds.contains(deleteworld))
+                        {
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§cそのワールドは存在しません");
+                            return true;
+                        }
+                        exceptiondpenaworlds.add(deleteworld);
+                        mspawn.getConfig().set("exceptiondpenaworlds",exceptiondpenaworlds);
+                        saveConfig();
+                        sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+deleteworld+"の死亡時のペナルティをONにしました");
+                        return true;
+                    }
+                }
             }
             default:
             {
@@ -819,7 +879,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
     @EventHandler
     public void PlayerRespawnEvent(PlayerRespawnEvent event)
     {
-        if (exceptionplayers.contains(event.getPlayer().getUniqueId()) || exceptionworlds.contains(event.getPlayer().getWorld().getName()) || !System)
+        if (exceptionplayers.contains(event.getPlayer().getUniqueId()) || exceptionworlds.contains(event.getPlayer().getWorld().getName()) || !system)
         {
             return;
         }
@@ -848,12 +908,16 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
             Bukkit.getScheduler().runTaskLater(this, new Runnable()
             {
                 @Override
-                public void run() {
-                    event.getPlayer().setHealth(respawnhealth);
-                    event.getPlayer().setFoodLevel(respawnfood);
-                    event.getPlayer().sendMessage(respawnmessage);
+                public void run()
+                {
+                    if (exceptiondpenaworlds.contains(event.getPlayer().getLocation().getWorld().getName()));
+                    {
+                        event.getPlayer().setHealth(respawnhealth);
+                        event.getPlayer().setFoodLevel(respawnfood);
+                        event.getPlayer().sendMessage(respawnmessage);
+                    }
                 }
-            }, 1);
+            }, 5);
         }
     }
 

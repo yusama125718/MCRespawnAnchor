@@ -56,7 +56,7 @@ public class Reload extends Thread
         }
         respawnfood = mspawn.getConfig().getInt("respawnfood");
         respawnmessage = mspawn.getConfig().getString("respawnmessage");
-        System = mspawn.getConfig().getBoolean("system");
+        system = mspawn.getConfig().getBoolean("system");
         JoinSystem = mspawn.getConfig().getBoolean("joinsystem");
         cpenalty = mspawn.getConfig().getBoolean("cpenalty");
         dpenalty = mspawn.getConfig().getBoolean("dpenalty");

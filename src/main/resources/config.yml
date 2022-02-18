@@ -1,24 +1,36 @@
-spawnx:
+respawnx:
 - 0
-spawny:
+respawny:
 - 0
-spawnz:
+respawnz:
 - 0
-spawnyaw:
+respawnyaw:
 - 0
-spawnpitch:
+respawnpitch:
 - 0
-spawnworld:
+respawnworld:
 - world
 targetworld:
 - world
+spawnx:
+  - 0
+spawny:
+  - 0
+spawnz:
+  - 0
+spawnyaw:
+  - 0
+spawnpitch:
+  - 0
+movetargetworld:
+  - world
 respawnhealth: 20
 respawnfood: 0
 respawnmessage: null
 system: true
 joinsystem: true
+movesystem: true
 cpenalty: false
 dpenalty: false
 exceptionworldlist:
 exceptionplayerlist:
-exceptiondpenaworlds:

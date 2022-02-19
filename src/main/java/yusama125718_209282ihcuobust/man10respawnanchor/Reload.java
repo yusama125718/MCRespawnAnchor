@@ -22,28 +22,28 @@ public class Reload extends Thread
         exceptionplayers.clear();
         exceptionworlds.clear();
         mspawn.reloadConfig();
-        respawnyawd.addAll(mspawn.getConfig().getDoubleList("spawnyaw"));
+        respawnyawd.addAll(mspawn.getConfig().getDoubleList("respawnyaw"));
         double changeyawd;
         float changeyaw;
-        for (int i = 0;i<(mspawn.getConfig().getDoubleList("spawnyaw")).size();i++)
+        for (int i = 0;i<(mspawn.getConfig().getDoubleList("respawnyaw")).size();i++)
         {
             changeyawd = respawnyawd.get(i);
             changeyaw = (float) (changeyawd);
             respawnyaw.add(changeyaw);
         }
-        respawnx.addAll(mspawn.getConfig().getDoubleList("spawnx"));
-        respawny.addAll(mspawn.getConfig().getDoubleList("spawny"));
-        respawnz.addAll(mspawn.getConfig().getDoubleList("spawnz"));
-        respawnpitchd.addAll(mspawn.getConfig().getDoubleList("spawnpitch"));
+        respawnx.addAll(mspawn.getConfig().getDoubleList("respawnx"));
+        respawny.addAll(mspawn.getConfig().getDoubleList("respawny"));
+        respawnz.addAll(mspawn.getConfig().getDoubleList("respawnz"));
+        respawnpitchd.addAll(mspawn.getConfig().getDoubleList("respawnpitch"));
         double changepitchd;
         float changepitch;
-        for (int i = 0;i<(mspawn.getConfig().getDoubleList("spawnpitch")).size();i++)
+        for (int i = 0;i<(mspawn.getConfig().getDoubleList("respawnpitch")).size();i++)
         {
             changepitchd = respawnpitchd.get(i);
             changepitch = (float) (changepitchd);
             respawnpitch.add(changepitch);
         }
-        respawnworld.addAll(mspawn.getConfig().getStringList("spawnworld"));
+        respawnworld.addAll(mspawn.getConfig().getStringList("respawnworld"));
         targetworld.addAll(mspawn.getConfig().getStringList("targetworld"));
         respawnhealth = mspawn.getConfig().getDouble("respawnhealth");
         if (respawnhealth>20)
@@ -69,7 +69,7 @@ public class Reload extends Thread
         }
         catch (NullPointerException e)
         {
-            Bukkit.broadcast("§l[§fMan10Spawn§f§l]§r除外するプレイヤーのロードに失敗しました","mspawn.op");
+            System.out.println("§l[§fMan10Spawn§f§l]§r除外するプレイヤーのロードに失敗しました");
         }
         try
         {
@@ -80,7 +80,28 @@ public class Reload extends Thread
         }
         catch (NullPointerException e)
         {
-            Bukkit.broadcast("§l[§fMan10Spawn§f§l]§r除外するワールドのロードに失敗しました","mspawn.op");
+            java.lang.System.out.println("§l[§fMan10Spawn§f§l]§r除外するワールドのロードに失敗しました");
         }
+        cpenalty = mspawn.getConfig().getBoolean("cpenalty");
+        dpenalty = mspawn.getConfig().getBoolean("dpenalty");
+        MoveSystem = mspawn.getConfig().getBoolean("movesystem");
+        spawnyawd.addAll(mspawn.getConfig().getDoubleList("spawnyaw"));
+        for (int i = 0;i<(mspawn.getConfig().getDoubleList("spawnyaw")).size();i++)
+        {
+            changeyawd = spawnyawd.get(i);
+            changeyaw = (float) (changeyawd);
+            spawnyaw.add(changeyaw);
+        }
+        spawnx.addAll(mspawn.getConfig().getDoubleList("spawnx"));
+        spawny.addAll(mspawn.getConfig().getDoubleList("spawny"));
+        spawnz.addAll(mspawn.getConfig().getDoubleList("spawnz"));
+        spawnpitchd.addAll(mspawn.getConfig().getDoubleList("spawnpitch"));
+        for (int i = 0;i<(mspawn.getConfig().getDoubleList("spawnpitch")).size();i++)
+        {
+            changepitchd = spawnpitchd.get(i);
+            changepitch = (float) (changepitchd);
+            spawnpitch.add(changepitch);
+        }
+        movetargetworld.addAll(mspawn.getConfig().getStringList("movetargetworld"));
     }
 }

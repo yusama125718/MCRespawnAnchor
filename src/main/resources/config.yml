@@ -13,17 +13,17 @@ respawnworld:
 targetworld:
 - world
 spawnx:
-  - 0
+- 0
 spawny:
-  - 0
+- 0
 spawnz:
-  - 0
+- 0
 spawnyaw:
-  - 0
+- 0
 spawnpitch:
-  - 0
+- 0
 movetargetworld:
-  - world
+- world
 respawnhealth: 20
 respawnfood: 0
 respawnmessage: null

@@ -95,7 +95,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
         {
             for (int i = 0; i < mspawn.getConfig().getList("exceptionplayerlist").size(); i++)
             {
-                exceptionplayers.add((UUID) (mspawn.getConfig().getList("exceptionplayerlist")).get(i));
+                exceptionplayers.add(UUID.fromString(mspawn.getConfig().getStringList("exceptionplayerlist").get(i)));
             }
         }
         catch (NullPointerException e)
@@ -133,6 +133,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
             changepitch = (float) (changepitchd);
             spawnpitch.add(changepitch);
         }
+        movetargetworld.addAll(mspawn.getConfig().getStringList("movetargetworld"));
         getServer().getPluginManager().registerEvents(this, this);
     }
 
@@ -331,13 +332,12 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         spawnz.set(i,pLocation.getZ());
                         spawnyaw.set(i,pLocation.getYaw());
                         spawnpitch.set(i,pLocation.getPitch());
-                        movetargetworld.set(i,pLocation.getWorld().getName());
                     }
-                    mspawn.getConfig().set("respawnx",spawnx);
-                    mspawn.getConfig().set("respawny",spawny);
-                    mspawn.getConfig().set("respawnz",spawnz);
-                    mspawn.getConfig().set("respawnyaw",spawnyaw);
-                    mspawn.getConfig().set("respawnpitch",spawnpitch);
+                    mspawn.getConfig().set("spawnx",spawnx);
+                    mspawn.getConfig().set("spawny",spawny);
+                    mspawn.getConfig().set("spawnz",spawnz);
+                    mspawn.getConfig().set("spawnyaw",spawnyaw);
+                    mspawn.getConfig().set("spawnpitch",spawnpitch);
                     mspawn.getConfig().set("movetargetworld",movetargetworld);
                     mspawn.saveConfig();
                     sender.sendMessage("§l[§fMan10Spawn§f§l]§eセットしました");
@@ -364,7 +364,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                             break aaa;
                         }
                     }
-                    if (i>=targetworld.size())
+                    if (i>targetworld.size() - 1)
                     {
                         i=0;
                     }
@@ -680,9 +680,11 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         else
                         {
                             exceptionplayers.add(addplayer.getUniqueId());
-                            sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+addplayer.getName()+"を除外します");
-                            mspawn.getConfig().set("exceptionplayerlist",exceptionplayers);
+                            List<String> addlist = mspawn.getConfig().getStringList("exceptionplayerlist");
+                            addlist.add(addplayer.getUniqueId().toString());
+                            mspawn.getConfig().set("exceptionplayerlist",addlist);
                             saveConfig();
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+addplayer.getName()+"を除外します");
                         }
                         return true;
                     }
@@ -702,9 +704,11 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         if (exceptionplayers.contains(deleteplayer.getUniqueId()))
                         {
                             exceptionplayers.remove(deleteplayer.getUniqueId());
-                            sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+deleteplayer.getName()+"を対象にします");
-                            mspawn.getConfig().set("exceptionplayerlist",exceptionplayers);
+                            List<String> addlist = mspawn.getConfig().getStringList("exceptionplayerlist");
+                            addlist.remove(deleteplayer.getUniqueId().toString());
+                            mspawn.getConfig().set("exceptionplayerlist",addlist);
                             saveConfig();
+                            sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+deleteplayer.getName()+"を対象にします");
                         }
                         else
                         {
@@ -921,7 +925,7 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                 break aaa;
             }
         }
-        if (i>=targetworld.size())
+        if (i>targetworld.size() - 1)
         {
             i=0;
         }
@@ -985,10 +989,11 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                 break aaa;
             }
         }
-        if (i>movetargetworld.size()-1)
+        if (i>movetargetworld.size())
         {
             return;
         }
+        System.out.println(i);
         Player joinplayer = event.getPlayer();
         Location joinlocation = joinplayer.getLocation();
         joinlocation.setX(spawnx.get(i));

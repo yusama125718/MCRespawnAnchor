@@ -591,12 +591,12 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                             respawnworld.set(i,pLocation.getWorld().getName());
                             targetworld.set(i,pLocation.getWorld().getName());
                         }
-                        mspawn.getConfig().set("spawnx",respawnx);
-                        mspawn.getConfig().set("spawny",respawny);
-                        mspawn.getConfig().set("spawnz",respawnz);
-                        mspawn.getConfig().set("spawnyaw",respawnyaw);
-                        mspawn.getConfig().set("spawnpitch",respawnpitch);
-                        mspawn.getConfig().set("spawnworld",respawnworld);
+                        mspawn.getConfig().set("respawnx",respawnx);
+                        mspawn.getConfig().set("respawny",respawny);
+                        mspawn.getConfig().set("respawnz",respawnz);
+                        mspawn.getConfig().set("respawnyaw",respawnyaw);
+                        mspawn.getConfig().set("respawnpitch",respawnpitch);
+                        mspawn.getConfig().set("respawnworld",respawnworld);
                         mspawn.getConfig().set("targetworld",targetworld);
                         mspawn.saveConfig();
                         sender.sendMessage("§l[§fMan10Spawn§f§l]§eセットしました");
@@ -642,12 +642,12 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         respawnpitch.remove(i);
                         respawnworld.remove(i);
                         targetworld.remove(i);
-                        mspawn.getConfig().set("spawnx",respawnx);
-                        mspawn.getConfig().set("spawny",respawny);
-                        mspawn.getConfig().set("spawnz",respawnz);
-                        mspawn.getConfig().set("spawnyaw",respawnyaw);
-                        mspawn.getConfig().set("spawnpitch",respawnpitch);
-                        mspawn.getConfig().set("spawnworld",respawnworld);
+                        mspawn.getConfig().set("respawnx",respawnx);
+                        mspawn.getConfig().set("respawny",respawny);
+                        mspawn.getConfig().set("respawnz",respawnz);
+                        mspawn.getConfig().set("respawnyaw",respawnyaw);
+                        mspawn.getConfig().set("respawnpitch",respawnpitch);
+                        mspawn.getConfig().set("respawnworld",respawnworld);
                         mspawn.getConfig().set("targetworld",targetworld);
                         mspawn.saveConfig();
                         sender.sendMessage("§l[§fMan10Spawn§f§l]§e削除しました");
@@ -831,12 +831,12 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                             respawnworld.set(i,pLocation.getWorld().getName());
                             targetworld.set(i,addworld);
                         }
-                        mspawn.getConfig().set("spawnx",respawnx);
-                        mspawn.getConfig().set("spawny",respawny);
-                        mspawn.getConfig().set("spawnz",respawnz);
-                        mspawn.getConfig().set("spawnyaw",respawnyaw);
-                        mspawn.getConfig().set("spawnpitch",respawnpitch);
-                        mspawn.getConfig().set("spawnworld",respawnworld);
+                        mspawn.getConfig().set("respawnx",respawnx);
+                        mspawn.getConfig().set("respawny",respawny);
+                        mspawn.getConfig().set("respawnz",respawnz);
+                        mspawn.getConfig().set("respawnyaw",respawnyaw);
+                        mspawn.getConfig().set("respawnpitch",respawnpitch);
+                        mspawn.getConfig().set("respawnworld",respawnworld);
                         mspawn.getConfig().set("targetworld",targetworld);
                         mspawn.saveConfig();
                         sender.sendMessage("§l[§fMan10Spawn§f§l]§eセットしました");
@@ -908,100 +908,6 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
             }
         }
         return true;
-    }
-
-    @EventHandler
-    public void PlayerRespawnEvent(PlayerRespawnEvent event)
-    {
-        if (exceptionplayers.contains(event.getPlayer().getUniqueId()) || exceptionworlds.contains(event.getPlayer().getWorld().getName()) || !system)
-        {
-            return;
-        }
-        int i=0;
-        aaa: for (i=0;i < targetworld.size();i++)
-        {
-            if (((event.getPlayer().getLocation()).getWorld()).getName().equals(targetworld.get(i)))
-            {
-                break aaa;
-            }
-        }
-        if (i>targetworld.size() - 1)
-        {
-            i=0;
-        }
-        Location respawnlocation = event.getRespawnLocation();
-        respawnlocation.setX(respawnx.get(i));
-        respawnlocation.setY(respawny.get(i));
-        respawnlocation.setZ(respawnz.get(i));
-        respawnlocation.setYaw(respawnyaw.get(i));
-        respawnlocation.setPitch(respawnpitch.get(i));
-        respawnlocation.setWorld(Bukkit.getWorld(respawnworld.get(i)));
-        event.setRespawnLocation(respawnlocation);
-        if (dpenalty)
-        {
-            Bukkit.getScheduler().runTaskLater(this, new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    event.getPlayer().setHealth(respawnhealth);
-                    event.getPlayer().setFoodLevel(respawnfood);
-                    event.getPlayer().sendMessage(respawnmessage);
-                }
-            }, 1);
-        }
-    }
-
-    @EventHandler
-    public void PlayerJoinEvent(PlayerJoinEvent joinEvent)
-    {
-        if (!JoinSystem)
-        {
-            return;
-        }
-        Player joinplayer = joinEvent.getPlayer();
-        Location joinlocation = joinplayer.getLocation();
-        joinlocation.setX(respawnx.get(0));
-        joinlocation.setY(respawny.get(0));
-        joinlocation.setZ(respawnz.get(0));
-        joinlocation.setYaw(respawnyaw.get(0));
-        joinlocation.setPitch(respawnpitch.get(0));
-        joinlocation.setWorld(Bukkit.getWorld(respawnworld.get(0)));
-        joinplayer.teleport(joinlocation);
-    }
-
-    @EventHandler
-    public void PlayerChangedWorldEvent(PlayerChangedWorldEvent event)
-    {
-        if (!system)
-        {
-            return;
-        }
-        if (!MoveSystem)
-        {
-            return;
-        }
-        int i=0;
-        aaa: for (i=0;i < movetargetworld.size();i++)
-        {
-            if (((event.getPlayer().getLocation()).getWorld()).getName().equals(movetargetworld.get(i)))
-            {
-                break aaa;
-            }
-        }
-        if (i>movetargetworld.size())
-        {
-            return;
-        }
-        System.out.println(i);
-        Player joinplayer = event.getPlayer();
-        Location joinlocation = joinplayer.getLocation();
-        joinlocation.setX(spawnx.get(i));
-        joinlocation.setY(spawny.get(i));
-        joinlocation.setZ(spawnz.get(i));
-        joinlocation.setYaw(spawnyaw.get(i));
-        joinlocation.setPitch(spawnpitch.get(i));
-        joinplayer.teleport(joinlocation);
     }
 
     @Override

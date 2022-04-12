@@ -264,26 +264,13 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         return true;
                     }
                     Location pLocation = ((Player) sender).getLocation();
-                    if (targetworld.size()==0)
-                    {
-                        respawnx.add(pLocation.getX());
-                        respawny.add(pLocation.getY());
-                        respawnz.add(pLocation.getZ());
-                        respawnyaw.add(pLocation.getYaw());
-                        respawnpitch.add(pLocation.getPitch());
-                        respawnworld.add(pLocation.getWorld().getName());
-                        targetworld.add(pLocation.getWorld().getName());
-                    }
-                    else
-                    {
-                        respawnx.set(0,pLocation.getX());
-                        respawny.set(0,pLocation.getY());
-                        respawnz.set(0,pLocation.getZ());
-                        respawnyaw.set(0,pLocation.getYaw());
-                        respawnpitch.set(0,pLocation.getPitch());
-                        respawnworld.set(0,pLocation.getWorld().getName());
-                        targetworld.set(0,pLocation.getWorld().getName());
-                    }
+                    respawnx.set(0,pLocation.getX());
+                    respawny.set(0,pLocation.getY());
+                    respawnz.set(0,pLocation.getZ());
+                    respawnyaw.set(0,pLocation.getYaw());
+                    respawnpitch.set(0,pLocation.getPitch());
+                    respawnworld.set(0,pLocation.getWorld().getName());
+                    targetworld.set(0,pLocation.getWorld().getName());
                     mspawn.getConfig().set("respawnx",respawnx);
                     mspawn.getConfig().set("respawny",respawny);
                     mspawn.getConfig().set("respawnz",respawnz);

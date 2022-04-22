@@ -875,12 +875,12 @@ public final class Man10RespawnAnchor extends JavaPlugin implements Listener, Co
                         respawnpitch.remove(i);
                         respawnworld.remove(i);
                         targetworld.remove(i);
-                        mspawn.getConfig().set("spawnx",respawnx);
-                        mspawn.getConfig().set("spawny",respawny);
-                        mspawn.getConfig().set("spawnz",respawnz);
-                        mspawn.getConfig().set("spawnyaw",respawnyaw);
-                        mspawn.getConfig().set("spawnpitch",respawnpitch);
-                        mspawn.getConfig().set("spawnworld",respawnworld);
+                        mspawn.getConfig().set("respawnx",respawnx);
+                        mspawn.getConfig().set("respawny",respawny);
+                        mspawn.getConfig().set("respawnz",respawnz);
+                        mspawn.getConfig().set("respawnyaw",respawnyaw);
+                        mspawn.getConfig().set("respawnpitch",respawnpitch);
+                        mspawn.getConfig().set("respawnworld",respawnworld);
                         mspawn.getConfig().set("targetworld",targetworld);
                         mspawn.saveConfig();
                         sender.sendMessage("§l[§fMan10Spawn§f§l]§e"+deleteworld+"の設定を削除しました");
